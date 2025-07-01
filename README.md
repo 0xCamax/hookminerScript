@@ -167,47 +167,12 @@ function getPermissions(address hook) external pure returns (
 function getFlag(string memory name) external pure returns (uint160)
 ```
 
-## Supported Hook Flags
-
-The deployer supports 14 different hook flags with their respective bit positions:
-
-| Flag Name                              | Bit Position | Description                              |
-| -------------------------------------- | ------------ | ---------------------------------------- |
-| `BEFORE_INITIALIZE`                    | 13           | Called before pool initialization        |
-| `AFTER_INITIALIZE`                     | 12           | Called after pool initialization         |
-| `BEFORE_ADD_LIQUIDITY`                 | 11           | Called before adding liquidity           |
-| `AFTER_ADD_LIQUIDITY`                  | 10           | Called after adding liquidity            |
-| `BEFORE_REMOVE_LIQUIDITY`              | 9            | Called before removing liquidity         |
-| `AFTER_REMOVE_LIQUIDITY`               | 8            | Called after removing liquidity          |
-| `BEFORE_SWAP`                          | 7            | Called before swap execution             |
-| `AFTER_SWAP`                           | 6            | Called after swap execution              |
-| `BEFORE_DONATE`                        | 5            | Called before donation                   |
-| `AFTER_DONATE`                         | 4            | Called after donation                    |
-| `BEFORE_SWAP_RETURNS_DELTA`            | 3            | Before swap with delta return            |
-| `AFTER_SWAP_RETURNS_DELTA`             | 2            | After swap with delta return             |
-| `AFTER_ADD_LIQUIDITY_RETURNS_DELTA`    | 1            | After add liquidity with delta return    |
-| `AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA` | 0            | After remove liquidity with delta return |
-
 ## Environment Variables
 
 - `API`: RPC endpoint URL for blockchain interaction
 
-## How It Works
 
-1. **Flag Encoding**: Convert hook flags into a single bigint value using bitwise operations
-2. **Address Computation**: Use CREATE2 formula to compute potential addresses
-3. **Flag Matching**: Check if computed address matches target flags using bitwise AND operations
-4. **Code Verification**: Verify the address is not already deployed
-5. **Safe Deployment**: Use `safeDeploy` for additional validation before deployment
-6. **Result**: Return the matching address and corresponding salt
-
-The CREATE2 address formula:
-
-```
-address = keccak256(0xFF + deployer + salt + keccak256(creationCode + constructorArgs))[12:]
-```
-
-## Key Features of the Final Deployer
+## Key Features of the Deployer
 
 ### Safe Deployment
 
@@ -217,21 +182,6 @@ The `safeDeploy` function provides additional safety by:
 - Ensuring the deployed address matches the expected address
 - Reverting if validation fails
 
-### Permission System
-
-The contract uses a sophisticated bitwise permission system where each hook flag corresponds to a specific bit in the address. This allows for:
-
-- Efficient flag checking using bitwise AND operations
-- Multiple flags per address
-- Human-readable permission queries
-
-### Gas Optimization
-
-The contract is optimized for gas efficiency through:
-
-- Assembly code for permission checks
-- Bitwise operations instead of array iterations
-- Efficient flag validation patterns
 
 ## Troubleshooting
 
