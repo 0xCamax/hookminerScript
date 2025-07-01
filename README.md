@@ -5,10 +5,7 @@ A TypeScript/Deno project for mining contract addresses with specific flags usin
 ## Features
 
 - **Address Mining**: Find contract addresses with specific flag patterns
-- **CREATE2 Support**: Uses CREATE2 deployment for deterministic address generation
 - **Hook Flags**: Support for various hook flags (e.g., BEFORE_INITIALIZE)
-- **Constructor Arguments**: Handle contracts with constructor parameters
-- **RPC Integration**: Check existing code at computed addresses
 - **Solidity Deployer**: Includes smart contract for actual deployment
 
 ## Prerequisites
@@ -42,7 +39,7 @@ import { encodeFlags } from './utils.ts';
 // Define your parameters
 const flags = encodeFlags([HookFlag.BEFORE_INITIALIZE]);
 const creationCode = '0x600060008060008055'; // Your contract bytecode
-const deployerAddress = '0x7EF2e0048f5bAeDe046f6BF797943daF4ED8CB47';
+const deployerAddress = '0x7EF2e0048f5bAeDe046f6BF797943daF4ED8CB47'; // Your HookDeployer address
 
 // Find a suitable address and salt
 const result = await HookMiner.find(
