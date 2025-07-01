@@ -21,26 +21,13 @@ A TypeScript/Deno project for mining contract addresses with specific flags usin
 
 1. Clone the repository:
 ```bash
-git clone <your-repo-url>
-cd hook-miner
+git clone https://github.com/0xCamax/hookminerScript
+cd hookminerScript
 ```
 
 2. Create a `.env` file in the project root:
 ```env
 API=https://your-rpc-endpoint-url
-```
-
-## Project Structure
-
-```
-.
-├── HookMiner.ts        # Main mining logic
-├── constants.ts        # Hook flag definitions
-├── types.ts           # Type definitions
-├── utils.ts           # Utility functions
-├── main.ts            # Example usage
-├── HookDeployer.sol   # Solidity contract for deployment
-└── .env               # Environment variables
 ```
 
 ## Usage
@@ -92,7 +79,7 @@ const result = await HookMiner.find(
 ### Running the Example
 
 ```bash
-deno run --allow-net --allow-env main.ts
+deno task mine
 ```
 
 ## API Reference
@@ -130,14 +117,6 @@ function deployHook(
 
 - `API`: RPC endpoint URL for blockchain interaction
 
-## Hook Flags
-
-The project supports various hook flags defined in `constants.ts`. Common flags include:
-
-- `BEFORE_INITIALIZE`: Execute before pool initialization
-- `AFTER_INITIALIZE`: Execute after pool initialization
-- And more...
-
 ## How It Works
 
 1. **Flag Encoding**: Convert hook flags into a single bigint value
@@ -151,27 +130,6 @@ The CREATE2 address formula:
 address = keccak256(0xFF + deployer + salt + keccak256(creationCode))[12:]
 ```
 
-## Error Handling
-
-The miner includes comprehensive error handling for:
-- RPC connection issues
-- Invalid parameters
-- Network errors
-- Address collision detection
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Troubleshooting
 
 ### Common Issues
 
