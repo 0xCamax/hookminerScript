@@ -1,7 +1,7 @@
-import { HookFlag } from './constants.ts';
 import { address, bytes, bytes32 } from './types.ts';
 import { solidityPacked, keccak256, toBeHex } from 'npm:ethers';
-import { encodeFlags } from './utils.ts';
+import { encodeFlags, HookFlag, verifyHooksInBytecode } from './utils.ts';
+
 
 export class HookMiner {
 	private static FLAG_MASK: number = 0x3fff;
@@ -72,14 +72,19 @@ export class HookMiner {
 
 	public static async find(
 		deployer: address,
-		flags: HookFlag[] | bigint,
+		flags: HookFlag[],
 		creationCode: bytes,
 		constructorArgs: bytes | undefined,
 		startSalt: number = 0
 	): Promise<{ address: address; salt: bytes32 }> {
 		try {
-			const targetFlags = Array.isArray(flags) ? encodeFlags(flags) : flags;
-
+			const { missing } = verifyHooksInBytecode(creationCode, flags);
+			const targetFlags = encodeFlags(flags);
+			if (missing.length > 0) {
+				throw new Error(
+					`Contract is mission implementation of flags: ${missing}`
+				);
+			}
 			const fullCode = this.encodeCreationCode(creationCode, constructorArgs);
 
 			let salt = startSalt;
@@ -108,7 +113,7 @@ export class HookMiner {
 				salt++;
 			}
 		} catch (err) {
-			this.log(`Failed to find valid salt: ${(err as Error).message}`);
+			this.log((err as Error).message);
 			throw err;
 		}
 	}
