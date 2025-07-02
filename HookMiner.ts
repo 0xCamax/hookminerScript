@@ -1,7 +1,12 @@
 import { address, bytes, bytes32 } from './types.ts';
 import { solidityPacked, keccak256, toBeHex } from 'npm:ethers';
-import { encodeFlags, HookFlag, verifyHooksInBytecode } from './utils.ts';
-
+import {
+	checkExtraFlags,
+	encodeFlags,
+	flagToString,
+	HookFlag,
+	verifyHooksInBytecode,
+} from './utils.ts';
 
 export class HookMiner {
 	private static FLAG_MASK: number = 0x3fff;
@@ -78,11 +83,25 @@ export class HookMiner {
 		startSalt: number = 0
 	): Promise<{ address: address; salt: bytes32 }> {
 		try {
-			const { missing } = verifyHooksInBytecode(creationCode, flags);
 			const targetFlags = encodeFlags(flags);
-			if (missing.length > 0) {
+			const { found } = verifyHooksInBytecode(creationCode);
+
+			const missingFlags = flags.filter((f) => !found.includes(f));
+			const ignoredFlags = checkExtraFlags(found, flags);
+
+			if (missingFlags.length > 0) {
 				throw new Error(
-					`Contract is mission implementation of flags: ${missing}`
+					`Contract is missing implementation of flags: ${missingFlags
+						.map(flagToString)
+						.join(', ')}`
+				);
+			}
+
+			if (ignoredFlags.length > 0) {
+				this.log(
+					'Contract contains the following flags in bytecode:',
+					ignoredFlags.map(flagToString).join(', '),
+					'but they were not declared in the provided flags and will be ignored.'
 				);
 			}
 			const fullCode = this.encodeCreationCode(creationCode, constructorArgs);

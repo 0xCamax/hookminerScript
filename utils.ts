@@ -35,7 +35,10 @@ const hookSelectors = {
 /**
  * Mapeo de HookFlag a su nombre de función (si aplica)
  */
-const hookFlagToFunctionName: Record<HookFlag, keyof typeof hookSelectors | null> = {
+const hookFlagToFunctionName: Record<
+	HookFlag,
+	keyof typeof hookSelectors | null
+> = {
 	[HookFlag.ALL_HOOK_MASK]: null,
 	[HookFlag.BEFORE_INITIALIZE]: 'beforeInitialize',
 	[HookFlag.AFTER_INITIALIZE]: 'afterInitialize',
@@ -56,42 +59,50 @@ const hookFlagToFunctionName: Record<HookFlag, keyof typeof hookSelectors | null
 /**
  * Verifica si un bytecode incluye todos los selectores correspondientes a los flags
  */
-export function verifyHooksInBytecode(
-	bytecode: string,
-	flags: HookFlag[]
-): { missing: string[]; found: string[] } {
+export function verifyHooksInBytecode(bytecode: string): { found: HookFlag[] } {
 	const normalizedBytecode = bytecode.replace(/^0x/, '').toLowerCase();
 
 	const found: HookFlag[] = [];
-	const missing: HookFlag[] = [];
 
-	for (const flag of flags) {
-		const functionName = hookFlagToFunctionName[flag];
-		if (!functionName) continue;
+	for (const [flag, functionName] of Object.entries(hookFlagToFunctionName)) {
+		if (functionName === null) continue;
 
-		const selector = hookSelectors[functionName].replace(/^0x/, '').toLowerCase();
+		const selector = hookSelectors[functionName]
+			.replace(/^0x/, '')
+			.toLowerCase();
+		const flagValue = parseInt(flag) as HookFlag;
+
 		if (normalizedBytecode.includes(selector)) {
-			found.push(flag);
-		} else {
-            console.log(missing)
-			missing.push(flag);
+			found.push(flagValue);
 		}
 	}
 
-	const flagToString = (flag: HookFlag): string =>
-		Object.entries(HookFlag).find(([_, v]) => v === flag)?.[0] ?? `Unknown(${flag})`;
-
-	return {
-		found: found.map(flagToString),
-		missing: missing.map(flagToString),
-	};
+	return { found };
+}
+export function flagToString(flag: HookFlag): string {
+	return (
+		Object.entries(HookFlag).find(([_, v]) => v === flag)?.[0] ??
+		`Unknown(${flag})`
+	);
 }
 
+export function checkExtraFlags(
+	found: HookFlag[],
+	flags: HookFlag[]
+): HookFlag[] {
+	return found.filter((f) => !flags.includes(f));
+}
 /**
  * Verifica si un selector está presente en el bytecode
  */
-export function hasSelectorInBytecode(bytecode: string, selector: string): boolean {
-	return bytecode.replace(/^0x/, '').toLowerCase().includes(selector.replace(/^0x/, '').toLowerCase());
+export function hasSelectorInBytecode(
+	bytecode: string,
+	selector: string
+): boolean {
+	return bytecode
+		.replace(/^0x/, '')
+		.toLowerCase()
+		.includes(selector.replace(/^0x/, '').toLowerCase());
 }
 
 /**

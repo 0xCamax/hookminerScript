@@ -171,7 +171,6 @@ function getFlag(string memory name) external pure returns (uint160)
 
 - `API`: RPC endpoint URL for blockchain interaction
 
-
 ## Key Features of the Deployer
 
 ### Safe Deployment
@@ -181,7 +180,6 @@ The `safeDeploy` function provides additional safety by:
 - Validating that the expected address has the required flags
 - Ensuring the deployed address matches the expected address
 - Reverting if validation fails
-
 
 ## Troubleshooting
 

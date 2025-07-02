@@ -7,7 +7,6 @@ import { AbiCoder } from 'npm:ethers';
 async function main() {
 	const flags = [
         HookFlag.BEFORE_ADD_LIQUIDITY,
-        HookFlag.AFTER_ADD_LIQUIDITY
     ];
 	const saltStart = 0;
 	const creationCode: bytes =
